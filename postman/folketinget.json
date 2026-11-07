@@ -1,0 +1,428 @@
+{
+  "info": {
+    "_postman_id": "d0b580a9-c218-43ed-960c-dd370ecfd834",
+    "name": "Folketinget API",
+    "description": "Denne collection tester CRUD-funktionaliteten i Folketinget API's person-endpoints. Den dækker oprettelse, hentning, opdatering og sletning af personer samt validering af input og fejlhåndtering for ugyldige eller ukendte ID'er. Testforløbet omfatter både succesfulde svar (200/201) og forventede fejl (400/404), herunder trimning af mellemrum, manglende navn, ugyldig position og gentagen sletning.\n\nCollectionen bruger `baseUrl` som API'ets basisadresse og `personId` til at dele ID'et på en oprettet person mellem requests.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "58677528",
+    "_collection_link": "https://go.postman.co/collection/58677528-d0b580a9-c218-43ed-960c-dd370ecfd834?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "POST gyldig person (201)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status er 201\", function () {",
+              "  pm.response.to.have.status(201);",
+              "});",
+              "pm.test(\"Response har _id\", function () {",
+              "  var json = pm.response.json();",
+              "  pm.expect(json).to.have.property(\"_id\");",
+              "});",
+              "pm.test(\"name er Test Person\", function () {",
+              "  var json = pm.response.json();",
+              "  pm.expect(json.name).to.eql(\"Test Person\");",
+              "});",
+              "var json = pm.response.json();",
+              "pm.collectionVariables.set(\"personId\", json._id);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Test Person\",\n  \"party\": \"Testpartiet\",\n  \"position\": \"minister\",\n  \"title\": \"Testminister\",\n  \"startDate\": \"2024-01-01\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}",
+          "host": [
+            "{{baseUrl}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GET en efter oprettelse (200)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status er 200\", function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "pm.test(\"_id matcher personId\", function () {",
+              "  var json = pm.response.json();",
+              "  pm.expect(json._id).to.eql(pm.collectionVariables.get(\"personId\"));",
+              "});",
+              "pm.test(\"party er Testpartiet\", function () {",
+              "  var json = pm.response.json();",
+              "  pm.expect(json.party).to.eql(\"Testpartiet\");",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/{{personId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "{{personId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "POST med mellemrum trimmes (201)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status er 201\", function () {",
+              "  pm.response.to.have.status(201);",
+              "});",
+              "pm.test(\"name er trimmet til Trim Test\", function () {",
+              "  var json = pm.response.json();",
+              "  pm.expect(json.name).to.eql(\"Trim Test\");",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"   Trim Test   \",\n  \"party\": \"Testpartiet\",\n  \"position\": \"formand\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}",
+          "host": [
+            "{{baseUrl}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "POST uden name (400)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status er 400\", function () {",
+              "  pm.response.to.have.status(400);",
+              "});",
+              "pm.test(\"Response har feltet error\", function () {",
+              "  var json = pm.response.json();",
+              "  pm.expect(json).to.have.property(\"error\");",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"party\": \"Testpartiet\",\n  \"position\": \"minister\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}",
+          "host": [
+            "{{baseUrl}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "POST ugyldig position (400)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status er 400\", function () {",
+              "  pm.response.to.have.status(400);",
+              "});",
+              "pm.test(\"Response har feltet error\", function () {",
+              "  var json = pm.response.json();",
+              "  pm.expect(json).to.have.property(\"error\");",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Test\",\n  \"party\": \"Testpartiet\",\n  \"position\": \"kokken\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}",
+          "host": [
+            "{{baseUrl}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GET alle (200)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status er 200\", function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "pm.test(\"Response er et array\", function () {",
+              "  var json = pm.response.json();",
+              "  pm.expect(json).to.be.an(\"array\");",
+              "});",
+              "pm.test(\"Array har mindst 1 element\", function () {",
+              "  var json = pm.response.json();",
+              "  pm.expect(json.length).to.be.at.least(1);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}",
+          "host": [
+            "{{baseUrl}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GET ugyldigt ID (400)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status er 400\", function () {",
+              "  pm.response.to.have.status(400);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/abc",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "abc"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "GET ukendt ID (404)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status er 404\", function () {",
+              "  pm.response.to.have.status(404);",
+              "});",
+              "pm.test(\"Response har feltet error\", function () {",
+              "  var json = pm.response.json();",
+              "  pm.expect(json).to.have.property(\"error\");",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/000000000000000000000000",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "000000000000000000000000"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "PUT opdater (200)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status er 200\", function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "pm.test(\"party er Nyt Parti\", function () {",
+              "  var json = pm.response.json();",
+              "  pm.expect(json.party).to.eql(\"Nyt Parti\");",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Test Person\",\n  \"party\": \"Nyt Parti\",\n  \"position\": \"minister\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/{{personId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "{{personId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "DELETE person (200)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status er 200\", function () {",
+              "  pm.response.to.have.status(200);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/{{personId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "{{personId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "DELETE igen (404)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status er 404\", function () {",
+              "  pm.response.to.have.status(404);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/{{personId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "{{personId}}"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000/api/persons"
+    },
+    {
+      "key": "personId",
+      "value": ""
+    }
+  ]
+}
