@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Person = require('./src/models/person');
 
-// Liste fra Mikkel: [name, title, party]
+// Ministre fra Mikkels liste: [name, title, party]
 const ministers = [
     ["Mette Frederiksen", "Statsminister", "S"],
     ["Pia Olsen Dyhr", "Økonomi- og indenrigsminister", "SF"],
@@ -26,21 +26,41 @@ const ministers = [
     ["Maria Reumert Gjerding", "Miljøminister", "SF"]
 ];
 
+// Partiformænd fra ft.dk (Hvem er hvad i Folketinget): [name, party]
+const leaders = [
+    ["Mette Frederiksen", "S"],
+    ["Pia Olsen Dyhr", "SF"],
+    ["Troels Lund Poulsen", "V"],
+    ["Morten Messerschmidt", "DF"],
+    ["Alex Vanopslagh", "LA"],
+    ["Lars Løkke Rasmussen", "M"],
+    ["Mona Juul", "KF"],
+    ["Inger Støjberg", "DD"],
+    ["Anne Heeager", "RV"],
+    ["Franciska Rosenkilde", "ALT"],
+    ["Lars Boje Mathiesen", "BP"]
+];
+
 async function main() {
     await mongoose.connect('mongodb://127.0.0.1:27017/folketingDB');
 
-    const people = ministers.map(([name, title, party]) => ({
+    const ministerDocs = ministers.map(([name, title, party]) => ({
         name,
         title,
         party,
         position: 'minister'
     }));
+    const leaderDocs = leaders.map(([name, party]) => ({
+        name,
+        party,
+        position: 'formand'
+    }));
 
-    // Sletter kun ministre, så formænd ikke forsvinder
-    await Person.deleteMany({ position: 'minister' });
-    await Person.insertMany(people);
+    // Sletter kun vores egne positioner, så scriptet kan køres igen uden dubletter
+    await Person.deleteMany({ position: { $in: ['minister', 'formand'] } });
+    await Person.insertMany([...ministerDocs, ...leaderDocs]);
 
-    console.log(`${people.length} ministre gemt`);
+    console.log(`${ministerDocs.length} ministre og ${leaderDocs.length} formænd gemt`);
     await mongoose.disconnect();
 }
 
