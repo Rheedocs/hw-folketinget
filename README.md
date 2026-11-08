@@ -41,7 +41,7 @@ src/
 2. `party`: tekst, påkrævet, trimmes
 3. `position`: kun `minister` eller `formand`, påkrævet
 4. `title`: tekst, valgfri (fx "Finansminister")
-5. `startDate`: dato, valgfri
+5. `startDate`: dato, valgfri. Vi har ikke udfyldt den i seed data. Datoerne står på hver persons CV side på ft.dk, men opgaven siger "hvis muligt", og vi prioriterede CRUD, tests og at kunne forklare koden. Feltet kan sættes med POST og PUT.
 
 ## Endpoints
 
