@@ -4,19 +4,18 @@ REST API til ministre og partiformænd i Folketinget, bygget med Node.js, Expres
 
 ## Kom i gang
 
-1. Kræver Node, Git og MongoDB lokalt på port 27017.
+1. Kræver Node, Git og MongoDB lokalt på port 27017. MongoDB skal køre, før serveren startes, ellers starter serveren ikke.
 2. Hent projektet og installer pakkerne:
 
 ```
 git clone https://github.com/Rheedocs/hw-folketinget.git
 cd hw-folketinget
 npm install
-npm start
 ```
 
-3. Serveren kører på http://localhost:3000. Der må kun køre én server ad gangen på port 3000.
-4. Importér `postman/folketinget.json` i Postman for at teste endpoints.
-5. Data lægges ind med `node seed.js` (når seed scriptet er færdigt).
+3. Læg data ind med `node seed.js` (21 ministre og 11 partiformænd). Det sletter alle ministre og formænd i din lokale database først, så scriptet kan køres igen uden dubletter.
+4. Start serveren med `npm start`. Den kører på http://localhost:3000. Der må kun køre én server ad gangen på port 3000.
+5. Importér `postman/folketinget.json` i Postman for at teste endpoints.
 
 ## Struktur og hvorfor
 
@@ -27,6 +26,8 @@ src/
   controllers/      håndterer request og response og vælger statuskode
   models/           Mongoose schema for en person
   middleware/       central fejlhåndtering
+seed.js             lægger 21 ministre og 11 partiformænd ind
+postman/            Postman collection til test
 ```
 
 **Hvorfor denne opdeling?** Hver mappe har ét ansvar, så det er let at finde, hvor noget sker, og ændre det uden at røre resten. Opgavens forslag er models, routes og controllers, og det har vi fulgt.
@@ -42,6 +43,8 @@ src/
 3. `position`: kun `minister` eller `formand`, påkrævet
 4. `title`: tekst, valgfri (fx "Finansminister")
 5. `startDate`: dato, valgfri. Vi har ikke udfyldt den i seed data. Datoerne står på hver persons CV side på ft.dk, men opgaven siger "hvis muligt", og vi prioriterede CRUD, tests og at kunne forklare koden. Feltet kan sættes med POST og PUT.
+
+Tre personer er både minister og formand (Mette Frederiksen, Pia Olsen Dyhr og Lars Løkke Rasmussen). De findes to gange i databasen med hver sin position, fordi en person kun har én position i modellen, og det holder opgaven enkel.
 
 ## Endpoints
 
