@@ -45,14 +45,15 @@ postman/            Postman collection til test
 5. `startDate`: dato, valgfri. Vi har ikke udfyldt den i seed data. Datoerne står på hver persons CV side på ft.dk, men opgaven siger "hvis muligt", og vi prioriterede CRUD, tests og at kunne forklare koden. Feltet kan sættes med POST og PUT.
 
 Tre personer er både minister og formand (Mette Frederiksen, Pia Olsen Dyhr og Lars Løkke Rasmussen). De findes to gange i databasen med hver sin position, fordi en person kun har én position i modellen, og det holder opgaven enkel.
+Vi bruger ikke et eksternt API. Data ligger i vores egen MongoDB og lægges ind med `node seed.js` fra ministerlisten og partiformændene på ft.dk. Opgaven kræver ikke et bestemt API, og Mikkel har bekræftet, at man selv vælger.
 
 ## Endpoints
 
 1. `GET /api/persons` henter alle (200)
 2. `GET /api/persons/:id` henter én (200, 400 ved ugyldigt id, 404 hvis den ikke findes)
 3. `POST /api/persons` opretter (201, 400 ved manglende eller ugyldige felter)
-4. `PUT /api/persons/:id` opdaterer (200, 400, 404)
-5. `DELETE /api/persons/:id` sletter (200, 404)
+4. `PUT /api/persons/:id` opdaterer kun de felter, der sendes (delvis opdatering), og de øvrige beholder deres værdi (200, 400, 404)
+5. `DELETE /api/persons/:id` sletter (200, 400 ved ugyldigt id, 404)
 
 ## Fejlhåndtering
 
@@ -60,14 +61,17 @@ Fejl sendes med `next(err)` til `src/middleware/errorHandler.js`, som har fire p
 
 ## Test
 
-Vi tester med en Postman collection (`postman/folketinget.json`). Den dækker: oprette og hente bagefter, at mellemrum trimmes, manglende navn, ugyldig position, ugyldigt id, ukendt id, opdatering, sletning og gentagen sletning. [Beskriv, hvad I fandt under test.]
+Vi tester med en Postman collection (`postman/folketinget.json`). Den dækker: oprette og hente bagefter, at mellemrum trimmes, manglende navn, ugyldig position, ugyldigt id, ukendt id, opdatering, sletning og gentagen sletning.
+Under test fandt vi, at PUT kun ændrer de felter, der sendes, så den er en delvis opdatering, og at runValidators er nødvendig, ellers kan en ugyldig position gemmes ved opdatering. Vi oplevede også falske 404 fejl, fordi en anden server stadig kørte på port 3000, derfor må der kun køre én ad gangen.
 
 ## Hvem har lavet hvad
 
 1. Create og read: Mattias [skriv din del]
 2. Update og delete: Goncalo [skriv din del]
-3. Skelet, seed, Postman og README: Nicki [skriv din del]
+3. Skelet, seed, Postman og README: Nicki. Opsatte repo, issues, regler og PR skabelon, lavede model, routes og seed, reviewede Gons og Mattias' PR'er og testede dem i Postman.
 
 ## Brug af AI
 
 [Hver person skriver: hvad bad du agenten om, hvad foreslog den, og hvad ændrede du?]
+Nicki: Jeg brugte Claude til at tilpasse ministerlisten og lave formandslisten i seed.js, til AGENTS.md, PR skabelonen og README udkastet, og til at få en Postman collection til at teste Gons update og delete. 
+Jeg læste alt igennem, testede selv i Postman og rettede det, der ikke passede, fx at seed.js kun må slette ministre og formænd.
