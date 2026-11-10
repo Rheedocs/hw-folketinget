@@ -15,12 +15,24 @@ exports.create = async (req, res, next) => {
     res.status(501).json({ error: 'Ikke implementeret endnu' });
 };
 
-// TODO (Gon): opdater med findByIdAndUpdate, brug { new: true, runValidators: true }. 404 hvis den ikke findes
+// Update /person/:id
+// returnDocument: 'after' og new: true gør præcis det samme, men new:true er deprecated i den nyere version af mongoose som giver en warning i consollen. Derfor brugt vi returnDocument: 'after' i stedet for new:true
 exports.update = async (req, res, next) => {
-    res.status(501).json({ error: 'Ikke implementeret endnu' });
+    try {
+        const person = await Person.findByIdAndUpdate(req.params.id, req.body, {
+            returnDocument: 'after',
+            runValidators: true
+        });
+        if (!person) return res.status(404).json({ error: 'Person ikke fundet' });
+        res.status(200).json(person);
+    } catch (err) {next(err);}
 };
 
-// TODO (Gon): slet med findByIdAndDelete. 404 hvis den ikke findes
+// Delete /person/:id
 exports.remove = async (req, res, next) => {
-    res.status(501).json({ error: 'Ikke implementeret endnu' });
+    try {
+        const person = await Person.findByIdAndDelete(req.params.id);
+        if (!person) return res.status(404).json({ error: 'Person ikke fundet' });
+        res.status(200).json(person);
+    } catch (err) {next(err);}
 };

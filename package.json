@@ -1,27 +1,28 @@
 {
-  "name": "hw-folketinget",
+  "name": "quit",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node src/app.js"
+  "description": "REST API til ministre og partiformænd i Folketinget, bygget med Node.js, Express og Mongoose. Gruppeopgave i Programmering (Hello World: Nicki, Goncalo og Mattias).",
+  "keywords": [],
+  "homepage": "https://github.com/Rheedocs/hw-folketinget#readme",
+  "bugs": {
+    "url": "https://github.com/Rheedocs/hw-folketinget/issues"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Rheedocs/hw-folketinget.git"
   },
-  "keywords": [],
-  "author": "",
   "license": "ISC",
+  "author": "",
   "type": "commonjs",
-  "bugs": {
-    "url": "https://github.com/Rheedocs/hw-folketinget/issues"
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node src/app.js"
   },
-  "homepage": "https://github.com/Rheedocs/hw-folketinget#readme",
   "dependencies": {
+    "body-parser": "^2.4.0",
     "express": "^5.3.0",
-    "mongoose": "^9.12.0",
+    "mongoose": "^9.12.1",
     "morgan": "^1.12.1"
   }
 }
