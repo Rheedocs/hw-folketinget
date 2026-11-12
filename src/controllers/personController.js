@@ -1,18 +1,31 @@
 const Person = require('../models/person');
 
-// TODO (Mattias): hent alle med Person.find(). Svar 200. Fejl: next(err)
 exports.getAll = async (req, res, next) => {
-    res.status(501).json({ error: 'Ikke implementeret endnu' });
+    try {
+        const persons = await Person.find();
+        res.status(200).json(persons);
+    } catch (err) {
+        next(err);
+    }
 };
 
-// TODO (Mattias): hent én med Person.findById. 404 hvis den ikke findes. Fejl: next(err)
 exports.getById = async (req, res, next) => {
-    res.status(501).json({ error: 'Ikke implementeret endnu' });
+    try {
+        const person = await Person.findById(req.params.id);
+        if (!person) return res.status(404).json({ error: 'Person ikke fundet' });
+        res.status(200).json(person);
+    } catch (err) {
+        next(err);
+    }
 };
 
-// TODO (Mattias): opret med Person.create(req.body). Svar 201. Fejl: next(err)
 exports.create = async (req, res, next) => {
-    res.status(501).json({ error: 'Ikke implementeret endnu' });
+    try {
+        const person = await Person.create(req.body);
+        res.status(201).json(person);
+    } catch (err) {
+        next(err);
+    }
 };
 
 // Update /person/:id
