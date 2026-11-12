@@ -75,3 +75,7 @@ Under test fandt vi, at PUT kun ændrer de felter, der sendes, så den er en del
 [Hver person skriver: hvad bad du agenten om, hvad foreslog den, og hvad ændrede du?]
 Nicki: Jeg brugte Claude til at tilpasse ministerlisten og lave formandslisten i seed.js, til AGENTS.md, PR skabelonen og README udkastet, og til at få en Postman collection til at teste Gons update og delete. 
 Jeg læste alt igennem, testede selv i Postman og rettede det, der ikke passede, fx at seed.js kun må slette ministre og formænd.
+
+Gon: [skriv din del]
+
+Mattias: [skriv din del]
