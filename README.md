@@ -58,6 +58,7 @@ Vi bruger ikke et eksternt API. Data ligger i vores egen MongoDB og lægges ind 
 ## Fejlhåndtering
 
 Fejl sendes med `next(err)` til `src/middleware/errorHandler.js`, som har fire parametre og logger den rigtige fejl på serveren. Ugyldige felter og ugyldigt id giver 400, ukendt id og ukendt endpoint giver 404, og alt andet giver 500.
+Forskel på 400 og 404 (Mattias): 400 betyder "Bad Request" og opstår, når klienten sender ugyldige data. 404 betyder "Not Found" og opstår, når en ressource ikke findes.
 
 ## Test
 
@@ -66,7 +67,7 @@ Under test fandt vi, at PUT kun ændrer de felter, der sendes, så den er en del
 
 ## Hvem har lavet hvad
 
-1. Create og read: Mattias [skriv din del]
+1. Create og read: Mattias. lavede create og read, testede i Postman, lavede PR for create og read også.
 2. Update og delete: Goncalo. Lavede update og delete, testede i Postman, lavede PR og reviewede Nicki og Mattias' PR'er. Testede Mattias' create og read i Postman.
 3. Skelet, seed, Postman og README: Nicki. Opsatte repo, issues, regler og PR skabelon, lavede model, routes og seed, reviewede Gons og Mattias' PR'er og testede dem i Postman.
 
@@ -78,4 +79,4 @@ Jeg læste alt igennem, testede selv i Postman og rettede det, der ikke passede,
 
 Gon: Jeg brugte copilot til at review min update og delete kode, da jeg selv skrev koden først. Den eneste den foreslog var at bruge returnDocument: true i update, hvilket jeg gjorde. Jeg testede i Postman, og statuskoder virkede som forventet.
 
-Mattias: [skriv din del]
+Mattias: Jeg bad agenten om at lave en plan for mit issue, derefter tjekket jeg planen som den forslog og sikre at den overholdte issuet.
