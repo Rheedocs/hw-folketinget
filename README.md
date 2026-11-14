@@ -67,7 +67,7 @@ Under test fandt vi, at PUT kun ændrer de felter, der sendes, så den er en del
 ## Hvem har lavet hvad
 
 1. Create og read: Mattias [skriv din del]
-2. Update og delete: Goncalo [skriv din del]
+2. Update og delete: Goncalo. Lavede update og delete, testede i Postman, lavede PR og reviewede Nicki og Mattias' PR'er. Testede Mattias' create og read i Postman.
 3. Skelet, seed, Postman og README: Nicki. Opsatte repo, issues, regler og PR skabelon, lavede model, routes og seed, reviewede Gons og Mattias' PR'er og testede dem i Postman.
 
 ## Brug af AI
@@ -76,6 +76,6 @@ Under test fandt vi, at PUT kun ændrer de felter, der sendes, så den er en del
 Nicki: Jeg brugte Claude til at tilpasse ministerlisten og lave formandslisten i seed.js, til AGENTS.md, PR skabelonen og README udkastet, og til at få en Postman collection til at teste Gons update og delete. 
 Jeg læste alt igennem, testede selv i Postman og rettede det, der ikke passede, fx at seed.js kun må slette ministre og formænd.
 
-Gon: [skriv din del]
+Gon: Jeg brugte copilot til at review min update og delete kode, da jeg selv skrev koden først. Den eneste den foreslog var at bruge returnDocument: true i update, hvilket jeg gjorde. Jeg testede i Postman, og statuskoder virkede som forventet.
 
 Mattias: [skriv din del]
