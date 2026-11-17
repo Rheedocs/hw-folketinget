@@ -56,11 +56,17 @@ async function main() {
         position: 'formand'
     }));
 
-    // Sletter kun vores egne positioner, så scriptet kan køres igen uden dubletter
-    await Person.deleteMany({ position: { $in: ['minister', 'formand'] } });
-    await Person.insertMany([...ministerDocs, ...leaderDocs]);
+    const operations = [...ministerDocs, ...leaderDocs].map((doc) => ({
+        updateOne: {
+            filter: { name: doc.name, position: doc.position },
+            update: { $set: doc },
+            upsert: true
+        }
+    }));
 
-    console.log(`${ministerDocs.length} ministre og ${leaderDocs.length} formænd gemt`);
+    const result = await Person.bulkWrite(operations);
+    console.log(`${result.upsertedCount} oprettet, ${result.modifiedCount} opdateret`);
+
     await mongoose.disconnect();
 }
 

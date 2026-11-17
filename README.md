@@ -13,7 +13,7 @@ cd hw-folketinget
 npm install
 ```
 
-3. Læg data ind med `node seed.js` (21 ministre og 11 partiformænd). Det sletter alle ministre og formænd i din lokale database først, så scriptet kan køres igen uden dubletter.
+3. Læg data ind med `node seed.js` (21 ministre og 11 partiformænd). Scriptet sletter ikke noget. Det opretter de personer, der mangler, og opdaterer dem, der allerede findes (på navn og position), så det kan køres igen uden dubletter, og personer, du selv har oprettet, bliver ikke rørt.
 4. Start serveren med `npm start`. Den kører på http://localhost:3000. Der må kun køre én server ad gangen på port 3000.
 5. Importér `postman/folketinget.json` i Postman for at teste endpoints.
 
