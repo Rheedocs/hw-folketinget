@@ -36,7 +36,7 @@ const leaders = [
     ["Lars Løkke Rasmussen", "M"],
     ["Mona Juul", "KF"],
     ["Inger Støjberg", "DD"],
-    ["Anne Heeager", "RV"],
+    ["Martin Lidegaard", "RV"],
     ["Franciska Rosenkilde", "ALT"],
     ["Lars Boje Mathiesen", "BP"]
 ];
