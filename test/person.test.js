@@ -104,6 +104,33 @@ describe('Person API', () => {
         assert.strictEqual(res.body.name, 'Test Person');
     });
 
+    it('create_ugyldigPosition_returnerer400', async () => {
+        // Arrange
+        const body = { name: 'Test', party: 'Testpartiet', position: 'kokken' };
+
+        // Act
+        const res = await request(app).post('/api/persons').send(body);
+
+        // Assert
+        assert.strictEqual(res.status, 400);
+        assert.ok(res.body.error);
+    });
+
+    it('create_ugyldigJson_returnerer400OgInvalidJson', async () => {
+        // Arrange
+        const brokenJson = '{ikke json';
+
+        // Act
+        const res = await request(app)
+            .post('/api/persons')
+            .set('Content-Type', 'application/json')
+            .send(brokenJson);
+
+        // Assert
+        assert.strictEqual(res.status, 400);
+        assert.strictEqual(res.body.error, 'Invalid JSON');
+    });
+
     it('remove_eksisterendePerson_returnerer200OgFjernerPerson', async () => {
         // Arrange
         const person = await Person.create({
