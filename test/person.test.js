@@ -38,7 +38,11 @@ describe('Person API', () => {
 
     it('create_gyldigPersonMedMellemrum_returnerer201OgTrimmerNavn', async () => {
         // Arrange
-        const body = { name: '   Trim Test   ', party: 'Testpartiet', position: 'formand' };
+        const body = {
+            name: '   Trim Test   ',
+            party: 'Testpartiet',
+            roles: [{ position: 'formand' }]
+        };
 
         // Act
         const res = await request(app).post('/api/persons').send(body);
@@ -49,9 +53,30 @@ describe('Person API', () => {
         assert.strictEqual(await Person.countDocuments(), 1);
     });
 
-    it('create_manglerName_returnerer400', async () => {
+    it('create_personMedToRoller_gemmerBeggeRoller', async () => {
         // Arrange
-        const body = { party: 'Testpartiet', position: 'minister' };
+        const body = {
+            name: 'Test Person',
+            party: 'Testpartiet',
+            roles: [
+                { position: 'minister', title: 'Statsminister' },
+                { position: 'formand' }
+            ]
+        };
+
+        // Act
+        const res = await request(app).post('/api/persons').send(body);
+
+        // Assert
+        assert.strictEqual(res.status, 201);
+        assert.strictEqual(res.body.roles.length, 2);
+        assert.strictEqual(res.body.roles[1].position, 'formand');
+        assert.strictEqual(await Person.countDocuments(), 1);
+    });
+
+    it('create_ingenRoller_returnerer400', async () => {
+        // Arrange
+        const body = { name: 'Test Person', party: 'Testpartiet', roles: [] };
 
         // Act
         const res = await request(app).post('/api/persons').send(body);
@@ -59,6 +84,49 @@ describe('Person API', () => {
         // Assert
         assert.strictEqual(res.status, 400);
         assert.ok(res.body.error);
+    });
+
+    it('create_manglerName_returnerer400', async () => {
+        // Arrange
+        const body = { party: 'Testpartiet', roles: [{ position: 'minister' }] };
+
+        // Act
+        const res = await request(app).post('/api/persons').send(body);
+
+        // Assert
+        assert.strictEqual(res.status, 400);
+        assert.ok(res.body.error);
+    });
+
+    it('create_ugyldigPosition_returnerer400', async () => {
+        // Arrange
+        const body = {
+            name: 'Test',
+            party: 'Testpartiet',
+            roles: [{ position: 'kokken' }]
+        };
+
+        // Act
+        const res = await request(app).post('/api/persons').send(body);
+
+        // Assert
+        assert.strictEqual(res.status, 400);
+        assert.ok(res.body.error);
+    });
+
+    it('create_ugyldigJson_returnerer400OgInvalidJson', async () => {
+        // Arrange
+        const brokenJson = '{ikke json';
+
+        // Act
+        const res = await request(app)
+            .post('/api/persons')
+            .set('Content-Type', 'application/json')
+            .send(brokenJson);
+
+        // Assert
+        assert.strictEqual(res.status, 400);
+        assert.strictEqual(res.body.error, 'Invalid JSON');
     });
 
     it('getById_ukendtId_returnerer404', async () => {
@@ -90,7 +158,7 @@ describe('Person API', () => {
         const person = await Person.create({
             name: 'Test Person',
             party: 'Testpartiet',
-            position: 'minister'
+            roles: [{ position: 'minister' }]
         });
 
         // Act
@@ -102,33 +170,7 @@ describe('Person API', () => {
         assert.strictEqual(res.status, 200);
         assert.strictEqual(res.body.party, 'Nyt Parti');
         assert.strictEqual(res.body.name, 'Test Person');
-    });
-
-    it('create_ugyldigPosition_returnerer400', async () => {
-        // Arrange
-        const body = { name: 'Test', party: 'Testpartiet', position: 'kokken' };
-
-        // Act
-        const res = await request(app).post('/api/persons').send(body);
-
-        // Assert
-        assert.strictEqual(res.status, 400);
-        assert.ok(res.body.error);
-    });
-
-    it('create_ugyldigJson_returnerer400OgInvalidJson', async () => {
-        // Arrange
-        const brokenJson = '{ikke json';
-
-        // Act
-        const res = await request(app)
-            .post('/api/persons')
-            .set('Content-Type', 'application/json')
-            .send(brokenJson);
-
-        // Assert
-        assert.strictEqual(res.status, 400);
-        assert.strictEqual(res.body.error, 'Invalid JSON');
+        assert.strictEqual(res.body.roles.length, 1);
     });
 
     it('remove_eksisterendePerson_returnerer200OgFjernerPerson', async () => {
@@ -136,7 +178,7 @@ describe('Person API', () => {
         const person = await Person.create({
             name: 'Test Person',
             party: 'Testpartiet',
-            position: 'minister'
+            roles: [{ position: 'minister' }]
         });
 
         // Act
