@@ -11,7 +11,7 @@ app.use('/api/persons', personRoutes);
 
 // TODO: routes tilføjes i næste trin
 
-app.use((req, res) => res.status(404).json({ error: 'Endpoint findes ikke' }));
+app.use((req, res) => res.status(404).json({ error: 'Endpoint not found' }));
 
 app.use(errorHandler);
 

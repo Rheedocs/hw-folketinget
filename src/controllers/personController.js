@@ -12,7 +12,7 @@ exports.getAll = async (req, res, next) => {
 exports.getById = async (req, res, next) => {
     try {
         const person = await Person.findById(req.params.id);
-        if (!person) return res.status(404).json({ error: 'Person ikke fundet' });
+        if (!person) return res.status(404).json({ error: 'Person not found' });
         res.status(200).json(person);
     } catch (err) {
         next(err);
@@ -36,7 +36,7 @@ exports.update = async (req, res, next) => {
             returnDocument: 'after',
             runValidators: true
         });
-        if (!person) return res.status(404).json({ error: 'Person ikke fundet' });
+        if (!person) return res.status(404).json({ error: 'Person not found' });
         res.status(200).json(person);
     } catch (err) {next(err);}
 };
@@ -45,7 +45,7 @@ exports.update = async (req, res, next) => {
 exports.remove = async (req, res, next) => {
     try {
         const person = await Person.findByIdAndDelete(req.params.id);
-        if (!person) return res.status(404).json({ error: 'Person ikke fundet' });
+        if (!person) return res.status(404).json({ error: 'Person not found' });
         res.status(200).json(person);
     } catch (err) {next(err);}
 };
