@@ -13,7 +13,7 @@ cd hw-folketinget
 npm install
 ```
 
-3. Læg data ind med `node seed.js` (21 ministre og 11 partiformænd). Scriptet sletter ikke noget. Det opretter de personer, der mangler, og opdaterer dem, der allerede findes (på navn og position), så det kan køres igen uden dubletter, og personer, du selv har oprettet, bliver ikke rørt.
+3. Læg data ind med `node seed.js` (29 personer). Scriptet sletter ikke noget. Det opretter de personer, der mangler, og opdaterer dem, der allerede findes (på navn og position), så det kan køres igen uden dubletter, og personer, du selv har oprettet, bliver ikke rørt.
 4. Start serveren med `npm start`. Den kører på http://localhost:3000. Der må kun køre én server ad gangen på port 3000.
 5. Importér `postman/folketinget.json` i Postman for at teste endpoints.
 
@@ -28,7 +28,7 @@ src/
   models/           Mongoose schema for en person
   middleware/       central fejlhåndtering
 test/               automatiske tests (npm test)
-seed.js             lægger 21 ministre og 11 partiformænd ind
+seed.js             lægger 29 personer ind (ministre og partiformænd)
 postman/            Postman collection til test
 ```
 
@@ -40,13 +40,19 @@ postman/            Postman collection til test
 
 ## Datamodel
 
+En person har et navn, et parti og en liste af roller.
+
 1. `name`: tekst, påkrævet, trimmes
 2. `party`: tekst, påkrævet, trimmes
-3. `position`: kun `minister` eller `formand`, påkrævet
-4. `title`: tekst, valgfri (fx "Finansminister")
-5. `startDate`: dato, valgfri. Vi har ikke udfyldt den i seed data. Datoerne står på hver persons CV side på ft.dk, men opgaven siger "hvis muligt", og vi prioriterede CRUD, tests og at kunne forklare koden. Feltet kan sættes med POST og PATCH.
+3. `roles`: liste med mindst én rolle. Hver rolle har:
+    1. `position`: kun `minister` eller `formand`, påkrævet
+    2. `title`: tekst, valgfri (fx "Finansminister")
+    3. `startDate`: dato, valgfri. Vi har ikke udfyldt den i seed data. Datoerne står på hver persons CV side på ft.dk, men opgaven siger "hvis muligt", og vi prioriterede CRUD, tests og at kunne forklare koden.
 
-Tre personer er både minister og formand (Mette Frederiksen, Pia Olsen Dyhr og Lars Løkke Rasmussen). De findes to gange i databasen med hver sin position, fordi en person kun har én position i modellen, og det holder opgaven enkel.
+Tre personer er både minister og formand (Mette Frederiksen, Pia Olsen Dyhr og Lars Løkke Rasmussen). De findes kun én gang i databasen med to roller, så navn og parti kun skal rettes ét sted.
+
+Konsekvens: roller ligger inde i personen, så en PATCH med `roles` erstatter hele listen og ikke kun én rolle. Det er en afvejning ved at gemme roller i en liste i stedet for som egne dokumenter.
+
 Vi bruger ikke et eksternt API. Data ligger i vores egen MongoDB og lægges ind med `node seed.js` fra ministerlisten og partiformændene på ft.dk. Opgaven kræver ikke et bestemt API, og Mikkel har bekræftet, at man selv vælger.
 
 ## Endpoints
@@ -89,3 +95,4 @@ Mattias: Jeg bad agenten om at lave en plan for mit issue, derefter tjekket jeg 
 2. seed.js sletter ikke længere noget, men opretter eller opdaterer personer. Den gamle regel ramte i praksis alle personer, også dem en bruger selv havde oprettet.
 3. Alle fejlbeskeder er nu på engelsk.
 4. app.js og server.js er delt, så vi kan have automatiske tests.
+5. En person kan nu have flere roller i en liste, så samme person ikke står flere gange. seed.js, tests og Postman er opdateret til den nye form.
