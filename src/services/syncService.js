@@ -24,6 +24,7 @@ exports.syncParties = async (client) => {
     const persons = await Person.find();
     let updated = 0;
     let notFound = 0;
+    const changes = [];
 
     // Ét kald ad gangen, så vi ikke overbelaster Folketingets API
     for (const person of persons) {
@@ -33,11 +34,12 @@ exports.syncParties = async (client) => {
             continue;
         }
         if (info.party !== person.party) {
+            changes.push({ name: person.name, from: person.party, to: info.party });
             person.party = info.party;
             await person.save();
             updated++;
         }
     }
 
-    return { updated, notFound };
+    return { updated, notFound, changes };
 };
