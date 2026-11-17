@@ -22,10 +22,12 @@ npm install
 ```
 src/
   app.js            samler Express, routes og fejlhåndtering
+  server.js         forbinder til MongoDB og starter serveren
   routes/           vælger hvilken controller en request skal til
   controllers/      håndterer request og response og vælger statuskode
   models/           Mongoose schema for en person
   middleware/       central fejlhåndtering
+test/               automatiske tests (npm test)
 seed.js             lægger 21 ministre og 11 partiformænd ind
 postman/            Postman collection til test
 ```
@@ -63,6 +65,7 @@ Forskel på 400 og 404 (Mattias): 400 betyder "Bad Request" og opstår, når kli
 ## Test
 
 Vi tester med en Postman collection (`postman/folketinget.json`) med 18 requests. Den dækker: oprette og hente bagefter, at mellemrum trimmes, manglende navn, ugyldig position, ugyldig JSON, ugyldigt id, ukendt id, hel og delvis opdatering, sletning, gentagen sletning og at personen er væk bagefter.
+Collectionen kan også køres uden Postman med `npx newman run postman/folketinget.json`. Derudover har vi automatiske tests i `test/person.test.js`, som køres med `npm test`. De bruger en separat testdatabase (`folketingTestDB`), så vores egentlige data ikke bliver rørt, og de kræver, at MongoDB kører.
 Under test fandt vi, at PATCH kun ændrer de felter, der sendes, så den er en delvis opdatering, og at runValidators er nødvendig, ellers kan en ugyldig position gemmes ved opdatering. Vi oplevede også falske 404 fejl, fordi en anden server stadig kørte på port 3000, derfor må der kun køre én ad gangen.
 
 ## Hvem har lavet hvad
@@ -74,8 +77,15 @@ Under test fandt vi, at PATCH kun ændrer de felter, der sendes, så den er en d
 ## Brug af AI
 
 Nicki: Jeg brugte Claude til at tilpasse ministerlisten og lave formandslisten i seed.js, til AGENTS.md, PR skabelonen og README udkastet, og til at få en Postman collection til at teste Gons update og delete. 
-Jeg læste alt igennem, testede selv i Postman og rettede det, der ikke passede, fx at seed.js kun må slette ministre og formænd.
+Jeg læste alt igennem, testede selv i Postman og rettede det. Jeg læste alt igennem, testede selv i Postman og rettede det, der ikke passede.
 
 Gon: Jeg brugte copilot til at review min update og delete kode, da jeg selv skrev koden først. Den eneste den foreslog var at bruge returnDocument: true i update, hvilket jeg gjorde. Jeg testede i Postman, og statuskoder virkede som forventet.
 
 Mattias: Jeg bad agenten om at lave en plan for mit issue, derefter tjekket jeg planen som den forslog og sikre at den overholdte issuet.
+
+## Efter Mikkels feedback
+
+1. PUT er ændret til PATCH, fordi opdateringen kun ændrer de felter, der sendes.
+2. seed.js sletter ikke længere noget, men opretter eller opdaterer personer. Den gamle regel ramte i praksis alle personer, også dem en bruger selv havde oprettet.
+3. Alle fejlbeskeder er nu på engelsk.
+4. app.js og server.js er delt, så vi kan have automatiske tests.
