@@ -44,21 +44,23 @@ const leaders = [
 async function main() {
     await mongoose.connect('mongodb://127.0.0.1:27017/folketingDB');
 
-    const ministerDocs = ministers.map(([name, title, party]) => ({
-        name,
-        title,
-        party,
-        position: 'minister'
-    }));
-    const leaderDocs = leaders.map(([name, party]) => ({
-        name,
-        party,
-        position: 'formand'
-    }));
+    // Én person pr. navn, med en liste af roller
+    const people = new Map();
 
-    const operations = [...ministerDocs, ...leaderDocs].map((doc) => ({
+    for (const [name, title, party] of ministers) {
+        people.set(name, { name, party, roles: [{ position: 'minister', title }] });
+    }
+    for (const [name, party] of leaders) {
+        if (people.has(name)) {
+            people.get(name).roles.push({ position: 'formand' });
+        } else {
+            people.set(name, { name, party, roles: [{ position: 'formand' }] });
+        }
+    }
+
+    const operations = [...people.values()].map((doc) => ({
         updateOne: {
-            filter: { name: doc.name, position: doc.position },
+            filter: { name: doc.name },
             update: { $set: doc },
             upsert: true
         }
