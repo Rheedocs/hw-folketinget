@@ -42,7 +42,7 @@ postman/            Postman collection til test
 2. `party`: tekst, påkrævet, trimmes
 3. `position`: kun `minister` eller `formand`, påkrævet
 4. `title`: tekst, valgfri (fx "Finansminister")
-5. `startDate`: dato, valgfri. Vi har ikke udfyldt den i seed data. Datoerne står på hver persons CV side på ft.dk, men opgaven siger "hvis muligt", og vi prioriterede CRUD, tests og at kunne forklare koden. Feltet kan sættes med POST og PUT.
+5. `startDate`: dato, valgfri. Vi har ikke udfyldt den i seed data. Datoerne står på hver persons CV side på ft.dk, men opgaven siger "hvis muligt", og vi prioriterede CRUD, tests og at kunne forklare koden. Feltet kan sættes med POST og PATCH.
 
 Tre personer er både minister og formand (Mette Frederiksen, Pia Olsen Dyhr og Lars Løkke Rasmussen). De findes to gange i databasen med hver sin position, fordi en person kun har én position i modellen, og det holder opgaven enkel.
 Vi bruger ikke et eksternt API. Data ligger i vores egen MongoDB og lægges ind med `node seed.js` fra ministerlisten og partiformændene på ft.dk. Opgaven kræver ikke et bestemt API, og Mikkel har bekræftet, at man selv vælger.
@@ -52,7 +52,7 @@ Vi bruger ikke et eksternt API. Data ligger i vores egen MongoDB og lægges ind 
 1. `GET /api/persons` henter alle (200)
 2. `GET /api/persons/:id` henter én (200, 400 ved ugyldigt id, 404 hvis den ikke findes)
 3. `POST /api/persons` opretter (201, 400 ved manglende eller ugyldige felter)
-4. `PUT /api/persons/:id` opdaterer kun de felter, der sendes (delvis opdatering), og de øvrige beholder deres værdi (200, 400, 404)
+4. `PATCH /api/persons/:id` opdaterer kun de felter, der sendes (delvis opdatering), og de øvrige beholder deres værdi (200, 400, 404)
 5. `DELETE /api/persons/:id` sletter (200, 400 ved ugyldigt id, 404)
 
 ## Fejlhåndtering
@@ -63,7 +63,7 @@ Forskel på 400 og 404 (Mattias): 400 betyder "Bad Request" og opstår, når kli
 ## Test
 
 Vi tester med en Postman collection (`postman/folketinget.json`) med 18 requests. Den dækker: oprette og hente bagefter, at mellemrum trimmes, manglende navn, ugyldig position, ugyldig JSON, ugyldigt id, ukendt id, hel og delvis opdatering, sletning, gentagen sletning og at personen er væk bagefter.
-Under test fandt vi, at PUT kun ændrer de felter, der sendes, så den er en delvis opdatering, og at runValidators er nødvendig, ellers kan en ugyldig position gemmes ved opdatering. Vi oplevede også falske 404 fejl, fordi en anden server stadig kørte på port 3000, derfor må der kun køre én ad gangen.
+Under test fandt vi, at PATCH kun ændrer de felter, der sendes, så den er en delvis opdatering, og at runValidators er nødvendig, ellers kan en ugyldig position gemmes ved opdatering. Vi oplevede også falske 404 fejl, fordi en anden server stadig kørte på port 3000, derfor må der kun køre én ad gangen.
 
 ## Hvem har lavet hvad
 

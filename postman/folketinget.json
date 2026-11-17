@@ -348,7 +348,7 @@
       "response": []
     },
     {
-      "name": "PUT opdater (200)",
+      "name": "PATCH opdater (200)",
       "event": [
         {
           "listen": "test",
@@ -367,7 +367,7 @@
         }
       ],
       "request": {
-        "method": "PUT",
+        "method": "PATCH",
         "header": [
           {
             "key": "Content-Type",
@@ -391,7 +391,7 @@
       "response": []
     },
     {
-      "name": "PUT delvis opdatering kun party (200)",
+      "name": "PATCH delvis opdatering kun party (200)",
       "event": [
         {
           "listen": "test",
@@ -411,7 +411,7 @@
         }
       ],
       "request": {
-        "method": "PUT",
+        "method": "PATCH",
         "header": [
           {
             "key": "Content-Type",
@@ -435,7 +435,7 @@
       "response": []
     },
     {
-      "name": "PUT ugyldig position (400)",
+      "name": "PATCH ugyldig position (400)",
       "event": [
         {
           "listen": "test",
@@ -453,7 +453,7 @@
         }
       ],
       "request": {
-        "method": "PUT",
+        "method": "PATCH",
         "header": [
           {
             "key": "Content-Type",
@@ -477,7 +477,7 @@
       "response": []
     },
     {
-      "name": "PUT ugyldigt ID (400)",
+      "name": "PATCH ugyldigt ID (400)",
       "event": [
         {
           "listen": "test",
@@ -492,7 +492,7 @@
         }
       ],
       "request": {
-        "method": "PUT",
+        "method": "PATCH",
         "header": [
           {
             "key": "Content-Type",
@@ -516,7 +516,7 @@
       "response": []
     },
     {
-      "name": "PUT ukendt ID (404)",
+      "name": "PATCH ukendt ID (404)",
       "event": [
         {
           "listen": "test",
@@ -534,7 +534,7 @@
         }
       ],
       "request": {
-        "method": "PUT",
+        "method": "PATCH",
         "header": [
           {
             "key": "Content-Type",
