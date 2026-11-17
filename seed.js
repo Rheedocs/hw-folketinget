@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const Person = require('./src/models/person');
+const { syncPeople } = require('./src/services/syncService');
 
 // Ministre fra Mikkels liste: [name, title, party]
 const ministers = [
@@ -58,16 +58,8 @@ async function main() {
         }
     }
 
-    const operations = [...people.values()].map((doc) => ({
-        updateOne: {
-            filter: { name: doc.name },
-            update: { $set: doc },
-            upsert: true
-        }
-    }));
-
-    const result = await Person.bulkWrite(operations);
-    console.log(`${result.upsertedCount} oprettet, ${result.modifiedCount} opdateret`);
+    const result = await syncPeople([...people.values()]);
+    console.log(`${result.created} oprettet, ${result.updated} opdateret`);
 
     await mongoose.disconnect();
 }
