@@ -27,8 +27,11 @@ src/
   controllers/      håndterer request og response og vælger statuskode
   models/           Mongoose schema for en person
   middleware/       central fejlhåndtering
+  services/         logik uden for controllerne, her synkronisering
+  clients/          henter data fra eksterne API'er og oversætter dem
+  jobs/             scripts, der kan køres efter en tidsplan
 test/               automatiske tests (npm test)
-seed.js             lægger 29 personer ind (ministre og partiformænd)
+seed.js             lægger 28 personer ind (ministre og partiformænd)
 postman/            Postman collection til test
 ```
 
@@ -36,7 +39,7 @@ postman/            Postman collection til test
 
 **Hvorfor ligger koden i `src`?** For at holde projektets rod overskuelig.
 
-**Hvorfor har vi ikke et servicelag?** Controllerne kalder modellen direkte, fordi der endnu ikke er forretningsregler, som skal gælde uanset klient. Et servicelag, der bare videresender kald, ville være unødvendig kompleksitet. Hvis projektet voksede med regler, ville vi tilføje det.
+**Hvorfor har vi et servicelag, men kun til synkronisering?** Controllerne kalder stadig modellen direkte, fordi CRUD ikke har egne regler, og et lag, der bare videresender kald, ville være unødvendig kompleksitet. Synkroniseringen med Folketingets API har derimod rigtig logik og to indgange (`seed.js` og et natligt job), så den ligger i `src/services/syncService.js`. Controlleren er uændret.
 
 ## Datamodel
 
@@ -96,3 +99,13 @@ Mattias: Jeg bad agenten om at lave en plan for mit issue, derefter tjekket jeg 
 3. Alle fejlbeskeder er nu på engelsk.
 4. app.js og server.js er delt, så vi kan have automatiske tests.
 5. En person kan nu have flere roller i en liste, så samme person ikke står flere gange. seed.js, tests og Postman er opdateret til den nye form.
+6. Der er en klient og en `syncService`, som kan opdatere partier fra Folketingets åbne API, og jobbet køres med `npm run sync`. Controlleren er uændret.
+7. Der er nu 15 automatiske tests, bl.a. af synkroniseringen med en falsk klient.
+
+## Synkronisering med Folketingets API
+
+Folketingets åbne API (`https://oda.ft.dk/api`) kræver ingen nøgle. En person ligger som en aktør, hvor partiet står som XML inde i feltet `biografi`. Derfor er der en klient i `src/clients/folketingClient.js`, som henter en person og oversætter til det, vi bruger (partiets forkortelse). Servicen `syncParties` får klienten ind udefra, sammenligner med databasen og opdaterer kun de partier, der er ændret. I tests bruger vi en falsk klient, så testene ikke afhænger af internettet.
+
+Jobbet køres med `npm run sync`. Det kalder API'et én gang pr. person og skriver, hvor mange partier der er opdateret, og hvor mange navne der ikke blev fundet. For at køre det hver nat kan man sætte kommandoen ind i Windows Opgavestyring eller cron. Controlleren behøver ikke ændres.
+
+Afgrænsning: roller (minister og formand) står som fri tekst i API'et, så dem synkroniserer vi ikke. Partiet læses med et lille mønster i XML'en, som kan gå i stykker, hvis Folketinget ændrer formatet. Jobbet afslørede en fejl i vores egne data: Radikale Venstres leder var stavet forkert i `seed.js` og er rettet.
