@@ -10,5 +10,8 @@ module.exports = (err, req, res, next) => {
     if (err.type === 'entity.parse.failed') {
         return res.status(400).json({ error: 'Invalid JSON' });
     }
+    if (err.status === 409) {
+        return res.status(409).json({ error: err.message });
+    }
     res.status(500).json({ error: 'Something went wrong on the server' });
 };

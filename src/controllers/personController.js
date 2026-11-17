@@ -1,8 +1,8 @@
-const Person = require('../models/person');
+const personService = require('../services/personService');
 
 exports.getAll = async (req, res, next) => {
     try {
-        const persons = await Person.find();
+        const persons = await personService.getAll();
         res.status(200).json(persons);
     } catch (err) {
         next(err);
@@ -11,7 +11,7 @@ exports.getAll = async (req, res, next) => {
 
 exports.getById = async (req, res, next) => {
     try {
-        const person = await Person.findById(req.params.id);
+        const person = await personService.getById(req.params.id);
         if (!person) return res.status(404).json({ error: 'Person not found' });
         res.status(200).json(person);
     } catch (err) {
@@ -21,31 +21,29 @@ exports.getById = async (req, res, next) => {
 
 exports.create = async (req, res, next) => {
     try {
-        const person = await Person.create(req.body);
+        const person = await personService.create(req.body);
         res.status(201).json(person);
     } catch (err) {
         next(err);
     }
 };
 
-// Update /person/:id
-// returnDocument: 'after' og new: true gør præcis det samme, men new:true er deprecated i den nyere version af mongoose som giver en warning i consollen. Derfor brugt vi returnDocument: 'after' i stedet for new:true
 exports.update = async (req, res, next) => {
     try {
-        const person = await Person.findByIdAndUpdate(req.params.id, req.body, {
-            returnDocument: 'after',
-            runValidators: true
-        });
+        const person = await personService.update(req.params.id, req.body);
         if (!person) return res.status(404).json({ error: 'Person not found' });
         res.status(200).json(person);
-    } catch (err) {next(err);}
+    } catch (err) {
+        next(err);
+    }
 };
 
-// Delete /person/:id
 exports.remove = async (req, res, next) => {
     try {
-        const person = await Person.findByIdAndDelete(req.params.id);
+        const person = await personService.remove(req.params.id);
         if (!person) return res.status(404).json({ error: 'Person not found' });
         res.status(200).json(person);
-    } catch (err) {next(err);}
+    } catch (err) {
+        next(err);
+    }
 };

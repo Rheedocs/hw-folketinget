@@ -188,4 +188,31 @@ describe('Person API', () => {
         assert.strictEqual(res.status, 200);
         assert.strictEqual(await Person.findById(person._id), null);
     });
+
+    it('create_navnFindesAllerede_returnerer409', async () => {
+        // Arrange
+        await Person.create({ name: 'Test Person', party: 'S', roles: [{ position: 'minister' }] });
+        const body = { name: 'Test Person', party: 'SF', roles: [{ position: 'formand' }] };
+
+        // Act
+        const res = await request(app).post('/api/persons').send(body);
+
+        // Assert
+        assert.strictEqual(res.status, 409);
+        assert.strictEqual(await Person.countDocuments(), 1);
+    });
+
+    it('update_omdoebesTilEksisterendeNavn_returnerer409', async () => {
+        // Arrange
+        await Person.create({ name: 'Foerste Person', party: 'S', roles: [{ position: 'minister' }] });
+        const second = await Person.create({ name: 'Anden Person', party: 'S', roles: [{ position: 'minister' }] });
+
+        // Act
+        const res = await request(app)
+            .patch(`/api/persons/${second._id}`)
+            .send({ name: 'Foerste Person' });
+
+        // Assert
+        assert.strictEqual(res.status, 409);
+    });
 });
