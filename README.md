@@ -13,7 +13,7 @@ cd hw-folketinget
 npm install
 ```
 
-3. Læg data ind med `node seed.js` (29 personer). Scriptet sletter ikke noget. Det opretter de personer, der mangler, og opdaterer dem, der allerede findes (på navn og position), så det kan køres igen uden dubletter, og personer, du selv har oprettet, bliver ikke rørt.
+3. Læg data ind med `node seed.js` (28 personer). Scriptet sletter ikke noget. Det opretter de personer, der mangler, og opdaterer dem, der allerede findes (på navn og position), så det kan køres igen uden dubletter, og personer, du selv har oprettet, bliver ikke rørt.
 4. Start serveren med `npm start`. Den kører på http://localhost:3000. Der må kun køre én server ad gangen på port 3000.
 5. Importér `postman/folketinget.json` i Postman for at teste endpoints.
 
@@ -27,7 +27,7 @@ src/
   controllers/      håndterer request og response og vælger statuskode
   models/           Mongoose schema for en person
   middleware/       central fejlhåndtering
-  services/         logik uden for controllerne, her synkronisering
+  services/         regler og logik uden for controllerne: personService og syncService
   clients/          henter data fra eksterne API'er og oversætter dem
   jobs/             scripts, der kan køres efter en tidsplan
 test/               automatiske tests (npm test)
@@ -39,7 +39,7 @@ postman/            Postman collection til test
 
 **Hvorfor ligger koden i `src`?** For at holde projektets rod overskuelig.
 
-**Hvorfor har vi et servicelag, men kun til synkronisering?** Controllerne kalder stadig modellen direkte, fordi CRUD ikke har egne regler, og et lag, der bare videresender kald, ville være unødvendig kompleksitet. Synkroniseringen med Folketingets API har derimod rigtig logik og to indgange (`seed.js` og et natligt job), så den ligger i `src/services/syncService.js`. Controlleren er uændret.
+**Hvorfor har vi et servicelag?** Controlleren skal kun tage imod requests og sende svar. Reglerne ligger i `src/services/personService.js`, fx at to personer ikke må have samme navn (det giver 409). Synkroniseringen med Folketingets API ligger i `src/services/syncService.js` og bruges både af `npm run sync` og af tests. Controlleren oversætter kun resultatet til en statuskode, fx 404, når en person ikke findes.
 
 ## Datamodel
 
@@ -56,14 +56,14 @@ Tre personer er både minister og formand (Mette Frederiksen, Pia Olsen Dyhr og 
 
 Konsekvens: roller ligger inde i personen, så en PATCH med `roles` erstatter hele listen og ikke kun én rolle. Det er en afvejning ved at gemme roller i en liste i stedet for som egne dokumenter.
 
-Vi bruger ikke et eksternt API. Data ligger i vores egen MongoDB og lægges ind med `node seed.js` fra ministerlisten og partiformændene på ft.dk. Opgaven kræver ikke et bestemt API, og Mikkel har bekræftet, at man selv vælger.
+Data ligger i vores egen MongoDB og lægges ind med `node seed.js` fra ministerlisten og partiformændene på ft.dk. Partierne kan opdateres fra Folketingets åbne API, se afsnittet om synkronisering nedenfor. Opgaven kræver ikke et bestemt API, og Mikkel har bekræftet, at man selv vælger.
 
 ## Endpoints
 
 1. `GET /api/persons` henter alle (200)
 2. `GET /api/persons/:id` henter én (200, 400 ved ugyldigt id, 404 hvis den ikke findes)
-3. `POST /api/persons` opretter (201, 400 ved manglende eller ugyldige felter)
-4. `PATCH /api/persons/:id` opdaterer kun de felter, der sendes (delvis opdatering), og de øvrige beholder deres værdi (200, 400, 404)
+3. `POST /api/persons` opretter (201, 400 ved manglende eller ugyldige felter, 409 hvis navnet allerede findes)
+4. `PATCH /api/persons/:id` opdaterer kun de felter, der sendes (delvis opdatering), og de øvrige beholder deres værdi (200, 400, 404, 409 hvis navnet allerede findes)
 5. `DELETE /api/persons/:id` sletter (200, 400 ved ugyldigt id, 404)
 
 ## Fejlhåndtering
@@ -74,7 +74,7 @@ Forskel på 400 og 404 (Mattias): 400 betyder "Bad Request" og opstår, når kli
 ## Test
 
 Vi tester med en Postman collection (`postman/folketinget.json`) med 19 requests. Den dækker: oprette og hente bagefter, at mellemrum trimmes, manglende navn, ugyldig position, ugyldig JSON, ugyldigt id, ukendt id, hel og delvis opdatering, sletning, gentagen sletning og at personen er væk bagefter.
-Collectionen kan også køres uden Postman med `npx newman run postman/folketinget.json`. Derudover har vi automatiske tests i `test/person.test.js`, som køres med `npm test`. De bruger en separat testdatabase (`folketingTestDB`), så vores egentlige data ikke bliver rørt, og de kræver, at MongoDB kører.
+Collectionen kan også køres uden Postman med `npx newman run postman/folketinget.json`. Derudover har vi automatiske tests i `test/person.test.js` og `test/syncService.test.js`, som køres med `npm test`. De bruger hver deres testdatabase (`folketingTestDB` og `folketingSyncTestDB`, fordi `node --test` kører filerne samtidig), så vores egentlige data ikke bliver rørt, og de kræver, at MongoDB kører.
 Under test fandt vi, at PATCH kun ændrer de felter, der sendes, så den er en delvis opdatering, og at runValidators er nødvendig, ellers kan en ugyldig position gemmes ved opdatering. Vi oplevede også falske 404 fejl, fordi en anden server stadig kørte på port 3000, derfor må der kun køre én ad gangen.
 
 ## Hvem har lavet hvad
@@ -100,7 +100,8 @@ Mattias: Jeg bad agenten om at lave en plan for mit issue, derefter tjekket jeg 
 4. app.js og server.js er delt, så vi kan have automatiske tests.
 5. En person kan nu have flere roller i en liste, så samme person ikke står flere gange. seed.js, tests og Postman er opdateret til den nye form.
 6. Der er en klient og en `syncService`, som kan opdatere partier fra Folketingets åbne API, og jobbet køres med `npm run sync`. Controlleren er uændret.
-7. Der er nu 15 automatiske tests, bl.a. af synkroniseringen med en falsk klient.
+7. Der er nu 17 automatiske tests, bl.a. af synkroniseringen med en falsk klient og af navneregelen (409).
+8. Controlleren kalder nu `personService`, som har en rigtig regel: to personer må ikke have samme navn. Det er derfor, servicelaget giver mening ud over at videresende kald.
 
 ## Synkronisering med Folketingets API
 
@@ -108,4 +109,4 @@ Folketingets åbne API (`https://oda.ft.dk/api`) kræver ingen nøgle. En person
 
 Jobbet køres med `npm run sync`. Det kalder API'et én gang pr. person og skriver, hvor mange partier der er opdateret, og hvor mange navne der ikke blev fundet. For at køre det hver nat kan man sætte kommandoen ind i Windows Opgavestyring eller cron. Controlleren behøver ikke ændres.
 
-Afgrænsning: roller (minister og formand) står som fri tekst i API'et, så dem synkroniserer vi ikke. Partiet læses med et lille mønster i XML'en, som kan gå i stykker, hvis Folketinget ændrer formatet. Jobbet afslørede en fejl i vores egne data: Radikale Venstres leder var stavet forkert i `seed.js` og er rettet.
+Afgrænsning: roller (minister og formand) står som fri tekst i API'et, så dem synkroniserer vi ikke. Partiet læses med et lille mønster i XML'en, som kan gå i stykker, hvis Folketinget ændrer formatet. Jobbet fandt et navn i `seed.js`, som ikke findes i Folketingets API, og det er rettet.
