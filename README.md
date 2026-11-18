@@ -73,7 +73,7 @@ Forskel på 400 og 404 (Mattias): 400 betyder "Bad Request" og opstår, når kli
 
 ## Test
 
-Vi tester med en Postman collection (`postman/folketinget.json`) med 18 requests. Den dækker: oprette og hente bagefter, at mellemrum trimmes, manglende navn, ugyldig position, ugyldig JSON, ugyldigt id, ukendt id, hel og delvis opdatering, sletning, gentagen sletning og at personen er væk bagefter.
+Vi tester med en Postman collection (`postman/folketinget.json`) med 19 requests. Den dækker: oprette og hente bagefter, at mellemrum trimmes, manglende navn, ugyldig position, ugyldig JSON, ugyldigt id, ukendt id, hel og delvis opdatering, sletning, gentagen sletning og at personen er væk bagefter.
 Collectionen kan også køres uden Postman med `npx newman run postman/folketinget.json`. Derudover har vi automatiske tests i `test/person.test.js`, som køres med `npm test`. De bruger en separat testdatabase (`folketingTestDB`), så vores egentlige data ikke bliver rørt, og de kræver, at MongoDB kører.
 Under test fandt vi, at PATCH kun ændrer de felter, der sendes, så den er en delvis opdatering, og at runValidators er nødvendig, ellers kan en ugyldig position gemmes ved opdatering. Vi oplevede også falske 404 fejl, fordi en anden server stadig kørte på port 3000, derfor må der kun køre én ad gangen.
 
